@@ -166,99 +166,99 @@ app.post('/submit-other', async (req, res) => {
 });
 
 
-//return related  
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, './uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-const upload = multer({ storage: storage });
+// //return related  
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, './uploads/');
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, Date.now() + path.extname(file.originalname));
+//   }
+// });
+// const upload = multer({ storage: storage });
 
 
-const uploadDir = './uploads/';   //if diractory not available than create
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
+// const uploadDir = './uploads/';   //if diractory not available than create
+// if (!fs.existsSync(uploadDir)) {
+//   fs.mkdirSync(uploadDir);
+// }
 
 
-app.post('/submit-return', upload.single('file'), async (req, res) => {
-  const { email, reason, message } = req.body;
+// app.post('/submit-return', upload.single('file'), async (req, res) => {
+//   const { email, reason, message } = req.body;
 
 
-  try {
+//   try {
     
-    const existing = await Contact.findOne({ email });
+//     const existing = await Contact.findOne({ email });
 
-    if (existing) {
-      const existingmsg = existing.returnRelated.find(
-        item => item.reason === reason
-      );
+//     if (existing) {
+//       const existingmsg = existing.returnRelated.find(
+//         item => item.reason === reason
+//       );
 
-      if (existingmsg) {
-        return res.json({ success: true, message: 'You have already sent a message for return/replace.' });
-      }
+//       if (existingmsg) {
+//         return res.json({ success: true, message: 'You have already sent a message for return/replace.' });
+//       }
 
-      existing.returnRelated.push({
-        reason,
-        message,
-        file: '/uploads/' + req.file.filename
+//       existing.returnRelated.push({
+//         reason,
+//         message,
+//         file: '/uploads/' + req.file.filename
  
-      });
+//       });
 
-      await existing.save();
+//       await existing.save();
 
-      return res.json({ success: true, message: 'Your message has been successfully sent!' });
-    }
+//       return res.json({ success: true, message: 'Your message has been successfully sent!' });
+//     }
 
-    // If user does not exist, create a new document and save it
-    const newreturnForm = new Contact({
-      email,
-      returnRelated: [
-        {
-          reason,
-          message,
-          file: '/uploads/' + req.file.filename
-        }
-      ]
-    });
+//     // If user does not exist, create a new document and save it
+//     const newreturnForm = new Contact({
+//       email,
+//       returnRelated: [
+//         {
+//           reason,
+//           message,
+//           file: '/uploads/' + req.file.filename
+//         }
+//       ]
+//     });
     
     
-             const transporter = nodemailer.createTransport({
-              service: 'gmail',
-              auth: {
-                  user: process.env.EMAIL_USER,
-                  pass: process.env.EMAIL_PASS,
-                },
-              });
+//              const transporter = nodemailer.createTransport({
+//               service: 'gmail',
+//               auth: {
+//                   user: process.env.EMAIL_USER,
+//                   pass: process.env.EMAIL_PASS,
+//                 },
+//               });
 
-          const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: `${reason} Update `,
-              html: `
-                <p>Hello ${email}</p>
-                <p>Thank you for contacting us regarding your order ${reason} issue. We appreciate you bringing this matter to our attention.</p>
-                  <p>We understand that you are experiencing ${reason} issue. We apologize for any inconvenience this may have caused.</p>
-             <p>We will keep you updated on the progress of your order and provide you with a resolution as soon as possible.</p>
-             <p>Thank you for your patience and understanding.</p>
-              <p>VHX View Team</p>
-            `,
-          };
+//           const mailOptions = {
+//             from: process.env.EMAIL_USER,
+//             to: email,
+//             subject: `${reason} Update `,
+//               html: `
+//                 <p>Hello ${email}</p>
+//                 <p>Thank you for contacting us regarding your order ${reason} issue. We appreciate you bringing this matter to our attention.</p>
+//                   <p>We understand that you are experiencing ${reason} issue. We apologize for any inconvenience this may have caused.</p>
+//              <p>We will keep you updated on the progress of your order and provide you with a resolution as soon as possible.</p>
+//              <p>Thank you for your patience and understanding.</p>
+//               <p>VHX View Team</p>
+//             `,
+//           };
 
-            const info =  await transporter.sendMail(mailOptions);
+//             const info =  await transporter.sendMail(mailOptions);
     
     
-    await newreturnForm.save();
+//     await newreturnForm.save();
 
-    res.json({ success: true, message: 'Thanks Your message has been sent!' });
-  } catch (error) {
-    console.error(error);
-    res.json({ success: false, message: 'Failed to submit order-related form' });
-  }
-});
+//     res.json({ success: true, message: 'Thanks Your message has been sent!' });
+//   } catch (error) {
+//     console.error(error);
+//     res.json({ success: false, message: 'Failed to submit order-related form' });
+//   }
+// });
 
 
 
