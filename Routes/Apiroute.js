@@ -50,15 +50,20 @@ app.get('/api', (req, res) => {
     });
   });
 
-  app.get('/cities', (req, res) => {
+  app.get('/cities', async (req, res) => {
+    const filePath = path.join(__dirname, '../city.json');
 
-    fs.readFile(path.join(__dirname, '../city.json'), 'utf8', (err, data) => {
-        if (err) {
-            return res.status(500).json({ error: 'Could not read the cities data' });
-        }
+    try {
+   
+        const data = await fsPromises.readFile(filePath, 'utf8');
+        
+        const cities = JSON.parse(data);
+        res.json(cities);
 
-        res.json(JSON.parse(data));
-    });
+    } catch (error) {
+        console.error('Error reading or parsing cities data:', error);
+        res.status(500).json({ error: 'Could not read or parse the cities data' });
+    }
 });
 
 
